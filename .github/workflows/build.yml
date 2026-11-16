@@ -1,0 +1,80 @@
+# Har bir o'zgarishda kodni tekshiradi, testlarni ishga tushiradi va
+# Android uchun APK yig'adi. `main` tarmog'ida APK "Releases" bo'limiga
+# ham joylanadi, uni telefonga yuklab o'rnatish mumkin.
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test va APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.50.0'
+          cache: true
+
+      - name: Kutubxonalarni yuklash
+        run: flutter pub get
+
+      - name: Kodni tahlil qilish
+        run: flutter analyze
+
+      - name: Testlar
+        run: flutter test
+
+      - name: APK yig'ish
+        run: flutter build apk --release
+
+      - name: APK'ni saqlash
+        uses: actions/upload-artifact@v4
+        with:
+          name: kalkulyator-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+
+  release:
+    name: APK'ni Releases bo'limiga joylash
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: kalkulyator-apk
+
+      - name: "\"latest\" relizini yangilash"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mv app-release.apk kalkulyator.apk
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest kalkulyator.apk \
+            --target "$GITHUB_SHA" \
+            --title "Kalkulyator — oxirgi APK" \
+            --notes "Bu APK \`main\` tarmog'idagi oxirgi koddan avtomatik yig'ilgan. Telefonga yuklab, o'rnatish mumkin. Sinov uchun login: \`admin\`, parol: \`12345\`."
