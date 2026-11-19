@@ -52,11 +52,11 @@ Bu o'quv loyihasi bo'lgani uchun login va parol kodning o'zida turadi ([`lib/log
 
 ## Telefonga o'rnatish (APK)
 
-Har bir o'zgarishdan keyin GitHub Actions ilovani avtomatik yig'adi. Tayyor APK shu yerda:
+Har bir o'zgarishdan keyin GitHub Actions ilovani avtomatik yig'adi. Tayyor APK'ni bitta bosish bilan yuklab olish mumkin:
 
-**[Releases → kalkulyator.apk](https://github.com/xNITE-oss/uni-mobile-app/releases/latest)**
+**[kalkulyator.apk ni yuklab olish](https://github.com/xNITE-oss/uni-mobile-app/releases/latest/download/kalkulyator.apk)**
 
-Faylni Android telefonga yuklab oching va o'rnatishga ruxsat bering.
+Faylni Android telefonga yuklab oching va o'rnatishga ruxsat bering. Boshqa ma'lumotlar [Releases](https://github.com/xNITE-oss/uni-mobile-app/releases/latest) sahifasida.
 
 ## Kompyuterda ishga tushirish
 
